@@ -16,7 +16,6 @@ let currentAMap = null
 // 定义一个map对象
 let map = shallowRef(null);
 
-
 // 初始化地图方法
 const initMap = ()=>{
     AMapLoader.load({
@@ -24,11 +23,13 @@ const initMap = ()=>{
         version:"2.0",      // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
         plugins:['AMap.Scale', 'AMap.ToolBar',
             'AMap.MapType', 'AMap.HawkEye',
-            'AMap.DistrictSearch', 'AMap.Marker'],       // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+            'AMap.DistrictSearch', 'AMap.Marker',
+            'AMap.Driving', 'AMap.Polyline',
+        'AMap.DragRoute'],       // 需要使用的的插件列表，如比例尺'AMap.Scale'等
     }).then((AMap)=>{
         currentAMap = AMap
         map.value = new AMap.Map("container",{  //设置地图容器id
-            viewMode:"3D",    //是否为3D地图模式
+            viewMode:"2D",    //是否为3D地图模式
             pitch: 45,
             zoom:5,           //初始化地图级别
             center:[105.602725,37.076636], //初始化地图中心点位置
@@ -47,26 +48,42 @@ const initMap = ()=>{
         }));
 
 
+        const path = [
+            new AMap.LngLat(117.28, 37.1),
+            new AMap.LngLat(120, 35.6),
+            new AMap.LngLat(115.6, 28.7),
+            new AMap.LngLat(110.39, 30.9),
+            new AMap.LngLat(116.379028, 39.865042),
+            new AMap.LngLat(116.427281, 39.903719),
+        ];
+
+
         /**
          * 标记点
          * @type {Property.Marker} 标记点
          */
         //创建一个 Marker 实例：
         const marker = new AMap.Marker({
-            position: new AMap.LngLat(117.28, 37.1), //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+            position: path[0], //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
         });
         const marker01 = new AMap.Marker({
-            position: new AMap.LngLat(120, 35.6), //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+            position: path[1], //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
         });
         const marker02 = new AMap.Marker({
-            position: new AMap.LngLat(115.6, 28.7), //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+            position: path[2], //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
         });
         const marker03 = new AMap.Marker({
-            position: new AMap.LngLat(110.39, 30.9), //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+            position: path[3], //经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+        });
+        const point01 = new AMap.Marker({
+            position: path[4]
+        });
+        const point02 = new AMap.Marker({
+            position: path[5]
         });
 
         // 创建Marker列表
-        const markerList = [marker, marker01, marker02, marker03];
+        const markerList = [marker, marker01, marker02, marker03, point01, point02];
 
         //将创建的点标记添加到已有的地图实例：
         map.value.add(markerList);
@@ -82,28 +99,23 @@ const initMap = ()=>{
         marker01.on('click', clickPoint)
         marker02.on('click', clickPoint)
         marker03.on('click', clickPoint)
+        point01.on('click', clickPoint)
+        point02.on('click', clickPoint)
 
-
-        function clickAnyWhere(e) {
-            console.log(e.target.getPosition());
-            alert(e.target.getPosition());
-        }
-        map.value.on('click', clickAnyWhere)
-
-
-
-
+        const polyline = new AMap.Polyline({
+            path: path,
+            borderWeight: 3, // 线条宽度，默认为 1
+            strokeColor: 'red', // 线条颜色
+            strokeWeight: 5,   //宽度
+            strokeStyle: 'solid',   //实线
+            lineJoin: 'round' // 折线拐点连接处样式
+        });
+        map.value.add(polyline)
 
     }).catch(e=>{
         console.log(e);
     })
 }
-
-
-
-
-
-
 
 
 
@@ -126,6 +138,6 @@ onMounted(()=>{
     padding:0px;
     margin: 5px 5px 0 5px;
     box-sizing: border-box;
-    height: 670px;
+    height: 735px;
 }
 </style>
