@@ -95,12 +95,24 @@ const initMap = ()=>{
             });
             infoWindow.open(map.value, e.target.getPosition());
         }
-        marker.on('click', clickPoint)
-        marker01.on('click', clickPoint)
-        marker02.on('click', clickPoint)
-        marker03.on('click', clickPoint)
-        point01.on('click', clickPoint)
-        point02.on('click', clickPoint)
+
+        // 循环遍历markerList中的点，并添加点击事件
+        markerList.forEach(function (mark) {
+            mark.on('click', clickPoint)
+        })
+
+        function specialClickPoint(e) {
+            var infoWindow = new currentAMap.InfoWindow({
+                content: "此处的经纬度为：" + e.target.getPosition() + "测试测试测试测<br>试测<br>试测<br>试测试测试测试测试",
+                offset: new AMap.Pixel(0, -30)
+            });
+            infoWindow.open(map.value, e.target.getPosition());
+        }
+
+
+
+        markerList[2].on('click', specialClickPoint)
+
 
         const polyline = new AMap.Polyline({
             path: path,
